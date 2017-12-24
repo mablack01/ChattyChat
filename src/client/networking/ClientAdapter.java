@@ -2,6 +2,7 @@ package client.networking;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -12,6 +13,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import server.object.UserMessage;
     
 public class ClientAdapter {
     
@@ -45,15 +47,16 @@ public class ClientAdapter {
 
             // Read commands from the stdin.
             ChannelFuture lastWriteFuture = null;
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            for (;;) {
-                String line = in.readLine();
+            Scanner s = new Scanner(System.in);
+            while(s.hasNext()){
+            	String line = s.nextLine();
                 if (line == null) {
                     break;
                 }
-
+                
+                UserMessage message = new UserMessage(line);
                 // Sends the received line to the server.
-                lastWriteFuture = ch.writeAndFlush(line + "\r\n");
+                lastWriteFuture = ch.writeAndFlush(message);
 
                 // If user typed the 'bye' command, wait until the server closes
                 // the connection.
@@ -61,12 +64,12 @@ public class ClientAdapter {
                     ch.closeFuture().sync();
                     break;
                 }
-            }
 
             // Wait until all messages are flushed before closing the channel.
             if (lastWriteFuture != null) {
                 lastWriteFuture.sync();
             }
+          }
         } finally {
             // The connection is closed automatically on shutdown.
             group.shutdownGracefully();
