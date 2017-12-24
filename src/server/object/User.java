@@ -9,11 +9,11 @@ import static java.lang.System.out;
 
 public class User {
 
-	private String userName;
-	private String password;
-	private String ip;
+	public String userName;
+	public String password;
+	public String ip;
 	
-	//Constructor
+	//Constructors
 	public User(String u, String p) throws SocketException{
 		userName = u;
 		password = p;
@@ -34,6 +34,10 @@ public class User {
 		}
 	}
 
+	public User(){
+		
+	}
+	
 	//Getters
 	public String getUserName(){
 		return this.userName;
