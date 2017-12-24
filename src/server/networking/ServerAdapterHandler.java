@@ -48,7 +48,7 @@ public class ServerAdapterHandler extends SimpleChannelInboundHandler<String> {
     	if(msg.charAt(0) == '[' && msg.charAt(msg.length()-1) == ']'){
     		String userName = msg.substring(1, msg.indexOf(",", 1));
     		String password = msg.substring(msg.indexOf(",", 1), msg.length()-2);
-    		User user = new User(userName, password);
+    		User user = new User(userName, password, ctx);
     		ctx.writeAndFlush(
                     "Welcome to the server, " + userName + "\n");
     	}

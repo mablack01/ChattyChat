@@ -1,22 +1,39 @@
 package server.object;
 
+import static java.lang.System.out;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
-import static java.lang.System.out;
 
+import io.netty.channel.ChannelHandlerContext;
+
+/**
+ * An object that represents a connected user.
+ * @author Miles Black & Paul Mikulskis
+ * @date Dec 24, 2017
+ */
 public class User {
 
 	public String userName;
 	public String password;
 	public String ip;
+	private ChannelHandlerContext channel;
 	
-	//Constructors
-	public User(String u, String p) throws SocketException{
-		userName = u;
-		password = p;
+	/**
+	 * Constructs a new user with the indicated
+	 * username and password.
+	 * @param u the username for the user.
+	 * @param p the password for the user.
+	 * @param ch the channel context of the current session.
+	 * @throws SocketException
+	 */
+	public User(String u, String p, ChannelHandlerContext ch) throws SocketException {
+		this.userName = u;
+		this.password = p;
+		this.channel = ch;
 		Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
 		
 		for (NetworkInterface netint : Collections.list(n)){
@@ -33,20 +50,37 @@ public class User {
 			}
 		}
 	}
-
-	public User(){
-		
+	
+	/**
+	 * Gets the username of the user.
+	 * @return username
+	 */
+	public String getUserName(){
+		return userName;
 	}
 	
-	//Getters
-	public String getUserName(){
-		return this.userName;
-	}
+	/**
+	 * Gets the password of the user.
+	 * @return password
+	 */
 	public String getPassword(){
-		return this.password;
+		return password;
 	}
+	
+	/**
+	 * Gets the ip address of the user.
+	 * @return ip
+	 */
 	public String getIP(){
-		return this.ip;
+		return ip;
+	}
+	
+	/**
+	 * Logs a user out from the current session.
+	 */
+	public void logout() {
+		ServerMaster.getUsersOnline().remove(this);
+		channel.channel().disconnect();
 	}
 }
 	
