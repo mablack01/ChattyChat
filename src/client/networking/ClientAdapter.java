@@ -13,12 +13,22 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
     
-public class ClientLauncher {
+public class ClientAdapter {
     
-    static final String HOST = System.getProperty("host", "127.0.0.1");
-    static final int PORT = Integer.parseInt(System.getProperty("port", "8992"));
+    private String host;
+    private int port;
+    
+    public ClientAdapter() {
+    	this.host = System.getProperty("host", "127.0.0.1");
+    	this.port = Integer.parseInt(System.getProperty("port", "8992"));;
+    }
+    
+    public ClientAdapter(String host, String port) {
+    	this.host = System.getProperty("host", host);
+    	this.port = Integer.parseInt(System.getProperty("port", port));;
+    }
 
-    public static void main(String[] args) throws Exception {
+    public void start() throws Exception {
         // Configure SSL.
         final SslContext sslCtx = SslContextBuilder.forClient()
             .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
@@ -28,10 +38,10 @@ public class ClientLauncher {
             Bootstrap b = new Bootstrap();
             b.group(group)
              .channel(NioSocketChannel.class)
-             .handler(new ClientAdapterInitializer(sslCtx));
+             .handler(new ClientAdapterInitializer(sslCtx, this));
 
             // Start the connection attempt.
-            Channel ch = b.connect(HOST, PORT).sync().channel();
+            Channel ch = b.connect(host, port).sync().channel();
 
             // Read commands from the stdin.
             ChannelFuture lastWriteFuture = null;
@@ -61,5 +71,13 @@ public class ClientLauncher {
             // The connection is closed automatically on shutdown.
             group.shutdownGracefully();
         }
+    }
+    
+    public String getHost() {
+    	return host;
+    }
+    
+    public int getPort() {
+    	return port;
     }
 }

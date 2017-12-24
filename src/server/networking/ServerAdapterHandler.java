@@ -1,4 +1,5 @@
 package server.networking;
+
 import java.net.InetAddress;
 
 import io.netty.channel.Channel;
@@ -11,9 +12,6 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
-/**
- * Handles a server-side channel.
- */
 public class ServerAdapterHandler extends SimpleChannelInboundHandler<String> {
 
     static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);

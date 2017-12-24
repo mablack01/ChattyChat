@@ -12,9 +12,11 @@ import io.netty.handler.ssl.SslContext;
 public class ClientAdapterInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
+    private final ClientAdapter client;
 
-    public ClientAdapterInitializer(SslContext sslCtx) {
+    public ClientAdapterInitializer(SslContext sslCtx, ClientAdapter client) {
         this.sslCtx = sslCtx;
+        this.client = client;
     }
 
     @Override
@@ -26,7 +28,7 @@ public class ClientAdapterInitializer extends ChannelInitializer<SocketChannel> 
         // and accept any invalid certificates in the client side.
         // You will need something more complicated to identify both
         // and server in the real world.
-        pipeline.addLast(sslCtx.newHandler(ch.alloc(), ClientLauncher.HOST, ClientLauncher.PORT));
+        pipeline.addLast(sslCtx.newHandler(ch.alloc(), client.getHost(), client.getPort()));
 
         // On top of the SSL handler, add the text line codec.
         pipeline.addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
