@@ -10,14 +10,21 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
     
-public class ServerLauncher {
+public class ServerAdapter {
     
-    static final int PORT = Integer.parseInt(System.getProperty("port", "8992"));
+    private int port;
+    
+    public ServerAdapter() {
+    	this.port =  Integer.parseInt(System.getProperty("port", "8992"));
+    }
+    
+    public ServerAdapter(String port) {
+    	this.port = Integer.parseInt(System.getProperty("port", port));
+    }
 
-    public static void main(String[] args) throws Exception {
+    public void start() throws Exception {
         SelfSignedCertificate ssc = new SelfSignedCertificate();
         SslContext sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -26,10 +33,12 @@ public class ServerLauncher {
              .channel(NioServerSocketChannel.class)
              .handler(new LoggingHandler(LogLevel.INFO))
              .childHandler(new ServerAdapterInitializer(sslCtx));
-            b.bind(PORT).sync().channel().closeFuture().sync();
+            System.out.println("The server is now online!");
+            b.bind(port).sync().channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+            System.out.println("The server has successfully shutdown.");
         }
     }
 }
